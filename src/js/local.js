@@ -1,9 +1,7 @@
-
-
 const MAX_ATTEMPTS = 3;
 let korean;
 let definition;
-let romanization;
+let romanizations;
 let currentAttempts = 0;
 let csvEntries = [];
 
@@ -30,6 +28,12 @@ function loadCSV() {
   });
 }
 
+/**
+ * Play a new round of the game.
+ * This function selects a random entry from the CSV data,
+ * displays the Korean word and its definition, and resets the game state.
+ * It also handles the input field and attempts.
+ */
 function play() {
   // Example usage
   const result = getRandomEntry();
@@ -38,8 +42,14 @@ function play() {
   document.getElementById('output').textContent = result.korean;
   document.getElementById('definition').textContent = 'Definition: ' + result.definition;
 
-  romanization = Aromanize.romanize(result.korean).trim();
-  console.log('Romanization →', romanization);
+  romanizations = [
+    Aromanize.romanize(result.korean, 'rr-translit').trim(),
+    Aromanize.romanize(result.korean).trim(), // rr
+    Aromanize.romanize(result.korean, 'skats').trim(),
+    Aromanize.romanize(result.korean, 'ebi').trim(),
+    Aromanize.romanize(result.korean, 'konsevich').trim(),
+  ]
+  console.log('Romanizations →', romanizations);
 
   // Delete input value
   document.getElementById('word-input').value = '';
@@ -102,6 +112,12 @@ function getRandomEntry() {
   return { korean, definition };
 }
 
+/**
+ * Sanitize the input by removing leading/trailing whitespace,
+ * converting to lowercase, and removing special characters.
+ * @param {string} input - The user's input.
+ * @returns {string} - The sanitized input.
+ */
 function sanitizeInput(input) {
   // Remove leading/trailing whitespace
   input = input.trim();
@@ -125,9 +141,12 @@ function checkAnswer(input) {
   input = sanitizeInput(input);
 
   console.log('Sanitized input → ', input);
-  console.log('Correct answer → ', romanization);
+  console.log('Possible answers → ', romanizations);
 
-  if (input === romanization) {
+  // Check if the input matches any of the romanizations
+  let isCorrect = romanizations.some(value => value.toLowerCase() === input);
+
+  if (isCorrect) {
     console.log('Correct!');
     showOrHide('play-again', true);
     showOrHide('result-ok', true);
@@ -198,7 +217,7 @@ function showOrHide(section, show = true) {
  */
 function correctAnswerShowOrHide(show = true) {
   if (show) {
-    document.getElementById('correct-answer-text').textContent = `Correct answer: ${romanization}`;
+    document.getElementById('correct-answer-text').textContent = `Correct answer: ${romanizations[0]}`;
     document.getElementById('correct-answer').style.display = 'block';
     document.getElementById('play-again-offer').style.display = 'block';
   } else {
