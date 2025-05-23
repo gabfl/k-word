@@ -3,7 +3,7 @@ const savedTheme = localStorage.getItem('theme') || 'auto';
 let korean;
 let definition;
 let romanizations;
-let currentAttempt = parseInt(localStorage.getItem('currentAttempt') || '1');;
+let currentAttempt;
 let csvEntries = [];
 
 /**
@@ -327,6 +327,7 @@ function renderStreaks() {
 /**
  * Update the attempt display on the page.
  * This function updates the DOM element that shows the number of attempts left.
+ * @param {number} attempt - The current attempt number.
  */
 function recordAttempt() {
   console.log('Record attempt');
@@ -337,6 +338,8 @@ function recordAttempt() {
     localStorage.setItem('currentAttempt', attempt);
     updateAttemptDisplay(attempt);
   }
+
+  return attempt;
 }
 
 /**
@@ -559,4 +562,5 @@ settingsModal.addEventListener('show.bs.modal', renderStatsInModal);
 resetStatsEventListener();
 
 // Update attempt display
+currentAttempt = parseInt(localStorage.getItem('currentAttempt') || recordAttempt())
 updateAttemptDisplay(currentAttempt);
