@@ -523,14 +523,13 @@ function shareStatsEventListener() {
   const wordsPlayed = correctAnswers + wrongAnswers;
   const winRate = totalAttempts > 0 ? ((correctAnswers / totalAttempts) * 100).toFixed(1) + '%' : '0%';
 
-  const shareText = `📊 K-Word Stats:
+  let shareText = `📊 K-Word Stats:
 🔥 Current Streak: ${currentStreak}
 🏆 Max Streak: ${maxStreak}
 ✅ Correct Answers: ${correctAnswers}
 ❌ Wrong Attempts: ${wrongAnswers}
 🎮 Words Played: ${wordsPlayed}
-📈 Win Rate: ${winRate}
-playkword.com`;
+📈 Win Rate: ${winRate}`;
 
   if (navigator.share) {
     navigator.share({
@@ -539,6 +538,9 @@ playkword.com`;
       url: 'https://playkword.com'
     }).catch((err) => console.log('Share failed:', err));
   } else {
+    // Add URL to the share text
+    shareText = `${shareText}\n\nPlay K-Word: https://playkword.com`;
+
     navigator.clipboard.writeText(shareText)
       .then(() => alert('📋 Stats copied to clipboard!'))
       .catch(() => alert('❌ Failed to copy stats.'));
