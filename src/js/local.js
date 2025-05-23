@@ -36,7 +36,7 @@ function loadCSV() {
  */
 function play() {
   // Example usage
-  const result = getRandomEntry();
+  const result = getCurrentOrNewEntry();
   console.log(`Word → ${result.korean}`);
   console.log(`Definition → ${result.definition}`);
   document.getElementById('output').textContent = result.korean;
@@ -93,13 +93,55 @@ function parseCSV(data) {
     const korean = line.slice(0, firstCommaIndex);
     let definition = line.slice(firstCommaIndex + 1);
 
+    // Remove leading/trailing whitespace
+    definition = definition.trim();
+
     // Remove leading/trailing quotes
     if (definition.startsWith('"') && definition.endsWith('"')) {
       definition = definition.slice(1, -1);
     }
 
+    // Capitalize the first letter
+    definition = definition.charAt(0).toUpperCase() + definition.slice(1);
+
     return [korean, definition];
   });
+}
+
+/**
+ * Get the current or new entry from local storage.
+ * If an entry is already stored, it returns that entry.
+ * Otherwise, it generates a new random entry,
+ * stores it in local storage, and returns it.
+ * @returns {Object} - The current or new entry.
+ */
+function getCurrentOrNewEntry() {
+  // Check if an entry is already stored
+  const stored = localStorage.getItem('currentEntry');
+
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch (e) {
+      // If corrupted, fallback to a new one
+      console.warn('Stored entry is invalid JSON, generating new one.');
+    }
+  }
+
+  // Otherwise, get a new random one
+  const newEntry = getRandomEntry(); // should return an object like { korean: ..., definition: ... }
+  localStorage.setItem('currentEntry', JSON.stringify(newEntry));
+  return newEntry;
+}
+
+/**
+ * Clear the current entry from local storage.
+ * This function is called when the user plays again or when the game is reset.
+ * It removes the stored entry from local storage.
+ */
+function clearCurrentEntry() {
+  // Clear the stored entry
+  localStorage.removeItem('currentEntry');
 }
 
 /**
@@ -160,6 +202,9 @@ function checkAnswer(input) {
     // Update the streak
     handleStreak();
 
+    // Clear the current entry from local storage
+    clearCurrentEntry();
+
     return true;
   } else {
     console.log('Incorrect!');
@@ -182,6 +227,9 @@ function checkAnswer(input) {
 
       // Reset current streak
       resetStreak();
+
+      // Clear the current entry from local storage
+      clearCurrentEntry();
     }
 
     return false;
