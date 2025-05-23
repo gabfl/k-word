@@ -26,7 +26,7 @@
         <h1 class="text-center mb-4">K-Word</h1>
 
         <!-- Korean word display -->
-        <h1 class="text-center mb-4" id="output" style="font-size: 4rem;">Loading...</h1>
+        <h1 class="text-center mb-4" id="output" style="font-size: 4rem;"></h1>
 
         <!-- Game -->
         <form id="word-form">
@@ -83,11 +83,11 @@
         </div>
 
         <!-- Welcome Modal -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Welcome to K-Word! 🇰🇷</h5>
+                <h5 class="modal-title" id="helpModalLabel">Welcome to K-Word! 🇰🇷</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
@@ -107,6 +107,41 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- About Modal -->
+        <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="aboutModalLabel">About 🇰🇷</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <p>
+                  <strong>K-Word</strong> is a simple, <a href="https://github.com/gabfl/k-word" target="_blank">open source</a> game built to help you practice Korean vocabulary through romanization challenges.
+                </p>
+                <p>
+                  This project was created by <strong>Gabriel Bordeaux</strong> and is available under a custom <a href="https://github.com/gabfl/k-word/blob/main/LICENSE" target="_blank">personal use license</a>.
+                </p>
+                <p>
+                  You're welcome to explore the code, play, and learn — but please respect the licensing terms. 😊
+                </p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Links -->
+        <div class="text-center mb-3 text-secondary small">
+          <a href="#" class="text-secondary text-decoration-underline" title="Help" data-bs-toggle="modal" data-bs-target="#helpModal">Help</a> |
+          <a href="#" class="text-secondary text-decoration-underline" title="Learn More" data-bs-toggle="modal" data-bs-target="#aboutModal">About</a> | 
+          &copy; <span id="year"></span>
+          <br />
+          Made with ❤️ and <a href="https://github.com/gabfl/k-word" target="_blank" class="text-secondary text-decoration-underline">open source</a>
         </div>
 
       </div>

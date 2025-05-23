@@ -386,13 +386,22 @@ function welcomeModal() {
   const hasDisabledModal = localStorage.getItem('kword-modal-disabled');
 
   if (!hasDisabledModal) {
-    const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+    const modal = new bootstrap.Modal(document.getElementById('helpModal'));
     modal.show();
   }
 
   document.getElementById('dont-show').addEventListener('click', function () {
     localStorage.setItem('kword-modal-disabled', 'true');
   });
+}
+
+/**
+ * Render the current year on the page.
+ * This function retrieves the current year and updates the DOM element.
+ */
+function renderYear() {
+  const year = new Date().getFullYear();
+  document.getElementById('year').textContent = year;
 }
 
 // load CSV
@@ -407,6 +416,9 @@ loadCSV()
   .catch(error => {
     console.error('Error loading CSV:', error);
   });
+
+// Show the current year
+renderYear()
 
 // Check result
 // if the form is submitted, check the answer
