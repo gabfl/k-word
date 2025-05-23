@@ -177,11 +177,17 @@ function checkAnswer(input) {
   // Sanitize the input
   input = sanitizeText(input);
 
+  // If it's empty, return false
+  if (input === '') {
+    console.log('Empty input');
+    return false;
+  }
+
   console.log('Sanitized input →', input);
   console.log('Possible answers → ', romanizations);
 
   // Check if the input matches any of the romanizations
-  let isCorrect = input !== "" && romanizations.some(value => sanitizeText(value) === input);
+  let isCorrect = romanizations.some(value => sanitizeText(value) === input);
 
   if (isCorrect) {
     console.log('Correct!');
