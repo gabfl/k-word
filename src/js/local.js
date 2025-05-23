@@ -200,11 +200,14 @@ function checkAnswer(input) {
     showOrHide('definition', true);
     lockInput(true);
 
-    // Update the streak
-    handleStreak();
-
     // Clear the current entry from local storage
     clearCurrentEntry();
+
+    // Update the statistics
+    updateStats(true);
+
+    // Re-render the streak
+    renderStreaks();
 
     return true;
   } else {
@@ -231,6 +234,9 @@ function checkAnswer(input) {
 
       // Clear the current entry from local storage
       clearCurrentEntry();
+
+      // Update the statistics
+      updateStats(false);
     }
 
     return false;
@@ -288,24 +294,6 @@ function lockInput(disable = true) {
 }
 
 /**
- * Update the current and maximum streaks in local storage.
- * The current streak is incremented by 1.
- * If the current streak exceeds the maximum streak, update the maximum streak.
- */
-function updateStreak() {
-  let current = parseInt(localStorage.getItem('currentStreak') || '0');
-  let max = parseInt(localStorage.getItem('maxStreak') || '0');
-
-  current += 1;
-  if (current > max) {
-    max = current;
-  }
-
-  localStorage.setItem('currentStreak', current);
-  localStorage.setItem('maxStreak', max);
-}
-
-/**
  * Get the current and maximum streaks from local storage.
  * @returns {Object} - An object containing the current and maximum streaks.
  */
@@ -314,15 +302,6 @@ function getStreaks() {
     current: parseInt(localStorage.getItem('currentStreak') || '0'),
     max: parseInt(localStorage.getItem('maxStreak') || '0'),
   };
-}
-
-/**
- * Handle the streak when the user answers correctly.
- * This function updates the streak and renders it on the page.
- */
-function handleStreak() {
-  updateStreak();
-  renderStreaks();
 }
 
 /**
@@ -445,6 +424,74 @@ function welcomeModal() {
 }
 
 /**
+ * Render the statistics in the modal.
+ * This function retrieves the current streak, maximum streak,
+ * total attempts, correct answers, and win rate from local storage
+ * and updates the DOM elements in the modal.
+ */
+function renderStatsInModal() {
+  const currentStreak = localStorage.getItem('currentStreak') || '0';
+  const maxStreak = localStorage.getItem('maxStreak') || '0';
+  const total = parseInt(localStorage.getItem('totalAttempts') || '0');
+  const correct = parseInt(localStorage.getItem('correctAnswers') || '0');
+  const winRate = total > 0 ? ((correct / total) * 100).toFixed(1) + '%' : '0%';
+
+  document.getElementById('modalCurrentStreak').textContent = currentStreak;
+  document.getElementById('modalMaxStreak').textContent = maxStreak;
+  document.getElementById('modalWinRate').textContent = winRate;
+}
+
+/**
+ * Update the statistics in local storage.
+ * This function increments the total attempts and correct answers
+ * if the answer is correct.
+ * It also updates the current streak and maximum streak.
+ * @param {boolean} isCorrect - Whether the answer is correct or not.
+ */
+function updateStats(isCorrect) {
+  let currentStreak = parseInt(localStorage.getItem('currentStreak') || '0');
+  let maxStreak = parseInt(localStorage.getItem('maxStreak') || '0');
+  let totalAttempts = parseInt(localStorage.getItem('totalAttempts') || '0');
+  let correctAnswers = parseInt(localStorage.getItem('correctAnswers') || '0');
+
+  totalAttempts++;
+
+  if (isCorrect) {
+    currentStreak++;
+    correctAnswers++;
+    if (currentStreak > maxStreak) maxStreak = currentStreak;
+  } else {
+    currentStreak = 0;
+  }
+
+  localStorage.setItem('currentStreak', currentStreak);
+  localStorage.setItem('maxStreak', maxStreak);
+  localStorage.setItem('totalAttempts', totalAttempts);
+  localStorage.setItem('correctAnswers', correctAnswers);
+}
+
+/**
+ * Reset the statistics event listener.
+ * This function adds an event listener to the reset button
+ * that confirms the action and resets the statistics in local storage.
+ * It also refreshes the modal display and updates the streak display.
+ */
+function resetStatsEventListener() {
+    document.getElementById('resetStatsBtn').addEventListener('click', function () {
+    const confirmed = confirm("Are you sure you want to delete all your stats?");
+    if (confirmed) {
+      localStorage.removeItem('currentStreak');
+      localStorage.removeItem('maxStreak');
+      localStorage.removeItem('totalAttempts');
+      localStorage.removeItem('correctAnswers');
+
+      renderStatsInModal(); // Refresh modal display
+      renderStreaks(); // Optional: refresh main UI
+    }
+  });
+}
+
+/**
  * Render the current year on the page.
  * This function retrieves the current year and updates the DOM element.
  */
@@ -502,3 +549,10 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
 
 // Initial theme load
 applyTheme(savedTheme);
+
+// Stats rendering when modal is shown
+const settingsModal = document.getElementById('settingsModal');
+settingsModal.addEventListener('show.bs.modal', renderStatsInModal);
+
+// Reset stats event listener
+resetStatsEventListener();
