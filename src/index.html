@@ -17,7 +17,7 @@
 
   <script type="text/javascript" src="js/aromanize.js"></script>
 </head>
-<body class="bg-light">
+<body class="bg-light" data-bs-theme="light">
 
   <div class="container py-5">
     <div class="row justify-content-center">
@@ -66,7 +66,7 @@
         <div class="container py-2">
             <h2 class="text-center mb-4">Streak Tracker</h2>
 
-            <table class="table table-bordered w-50 mx-auto text-center">
+            <table id="streakTable" class="table table-bordered w-50 mx-auto text-center">
                 <thead class="table-light">
                 <tr>
                     <th>Current Streak</th>
@@ -109,6 +109,38 @@
           </div>
         </div>
 
+        <!-- Dark Mode Settings Modal -->
+        <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+              <div class="modal-header">
+                <h5 class="modal-title" id="settingsModalLabel">🌓 Theme Settings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+
+              <div class="modal-body text-center">
+                <p class="mb-3">Choose your theme:</p>
+                <div class="btn-group" role="group" aria-label="Theme toggle">
+                  <input type="radio" class="btn-check" name="themeToggle" id="themeAuto" value="auto" autocomplete="off">
+                  <label class="btn btn-outline-secondary" for="themeAuto">Auto</label>
+
+                  <input type="radio" class="btn-check" name="themeToggle" id="themeLight" value="light" autocomplete="off">
+                  <label class="btn btn-outline-secondary" for="themeLight">Light</label>
+
+                  <input type="radio" class="btn-check" name="themeToggle" id="themeDark" value="dark" autocomplete="off">
+                  <label class="btn btn-outline-secondary" for="themeDark">Dark</label>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
         <!-- About Modal -->
         <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
           <div class="modal-dialog">
@@ -138,6 +170,7 @@
         <!-- Footer Links -->
         <div class="text-center mb-3 text-secondary small">
           <a href="#" class="text-secondary text-decoration-underline" title="Help" data-bs-toggle="modal" data-bs-target="#helpModal">Help</a> |
+          <a href="#" class="text-secondary text-decoration-underline" title="Learn More" data-bs-toggle="modal" data-bs-target="#settingsModal">Settings</a> | 
           <a href="#" class="text-secondary text-decoration-underline" title="Learn More" data-bs-toggle="modal" data-bs-target="#aboutModal">About</a> | 
           &copy; <span id="year"></span>
           <br />

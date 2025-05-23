@@ -1,4 +1,5 @@
 const MAX_ATTEMPTS = 3;
+const savedTheme = localStorage.getItem('theme') || 'auto';
 let korean;
 let definition;
 let romanizations;
@@ -380,6 +381,54 @@ function updateAttemptDisplay() {
 }
 
 /**
+ * Apply the selected theme to the page.
+ * This function updates the body class and theme attributes based on the selected theme.
+ * It also updates the table header class for the streak table.
+ * @param {string} theme - The selected theme ('dark', 'light', or 'auto').
+ */
+function applyTheme(theme) {
+  console.log('Theme → ', savedTheme);
+
+  const body = document.body;
+  body.classList.remove('light-mode', 'dark-mode'); // Optional: if you had custom classes
+
+  const tableHead = document.querySelector('#streakTable thead');
+
+  if (theme === 'dark') {
+    body.setAttribute('data-bs-theme', 'dark');
+    body.classList.remove('bg-light');
+    body.classList.add('bg-dark', 'text-light');
+
+    // Header of streak table
+    tableHead.classList.remove('table-light');
+    tableHead.classList.add('table-dark');
+  } else if (theme === 'light') {
+    body.setAttribute('data-bs-theme', 'light');
+    body.classList.remove('bg-dark', 'text-light');
+    body.classList.add('bg-light');
+
+    // Header of streak table
+    tableHead.classList.remove('table-dark');
+    tableHead.classList.add('table-light');
+  } else if (theme === 'auto') {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const systemTheme = prefersDark ? 'dark' : 'light';
+    applyTheme(systemTheme); // Reuse logic for actual mode
+  }
+}
+
+/**
+ * Save the selected theme to local storage and apply it.
+ * This function updates the local storage with the selected theme
+ * and applies the theme to the page.
+ * @param {string} theme - The selected theme ('dark', 'light', or 'auto').
+ */
+function saveTheme(theme) {
+  localStorage.setItem('theme', theme);
+  applyTheme(theme);
+}
+
+/**
  * Show a welcome modal to the user.
  */
 function welcomeModal() {
@@ -433,3 +482,23 @@ document.getElementById('play-again-form').addEventListener('submit', function(e
   event.preventDefault();
   play();
 });
+
+// Theme toggle
+const selected = document.querySelector(`input[name="themeToggle"][value="${savedTheme}"]`);
+if (selected) selected.checked = true;
+
+document.querySelectorAll('input[name="themeToggle"]').forEach(btn => {
+  btn.addEventListener('change', (e) => {
+    saveTheme(e.target.value);
+  });
+});
+
+// Re-apply on system theme change if in auto mode
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if (localStorage.getItem('theme') === 'auto') {
+    applyTheme('auto');
+  }
+});
+
+// Initial theme load
+applyTheme(savedTheme);
