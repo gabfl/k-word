@@ -38,10 +38,10 @@ function loadCSV() {
 function play() {
   // Example usage
   const result = getCurrentOrNewEntry();
-  // console.log(`Word → ${result.korean}`);
-  // console.log(`Definition → ${result.definition}`);
+  // console.log('Word →', result.korean);
+  // console.log('Definition →', result.definition);
   document.getElementById('output').textContent = result.korean;
-  document.getElementById('definition').textContent = 'Definition: ' + result.definition;
+  document.getElementById('definition').textContent = result.definition;
 
   romanizations = [
     Aromanize.romanize(result.korean, 'rr-translit').trim(),
@@ -159,16 +159,13 @@ function getRandomEntry() {
  * @returns {string} - The sanitized text.
  */
 function sanitizeText(input) {
-  // Remove leading/trailing whitespace
-  input = input.trim();
-
-  // Convert to lowercase
-  input = input.toLowerCase();
-
-  // Remove special characters
-  input = input.replace(/[^a-zA-Z0-9]/g, '');
-
-  return input;
+  return input
+    .trim()
+    .toLowerCase()
+    // Normalize accents (like ö → o)
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    // Remove most symbols/punctuation but keep letters (including Korean, Cyrillic, etc.)
+    .replace(/[^\p{L}\p{N}]/gu, '');
 }
 
 /**
@@ -180,11 +177,11 @@ function checkAnswer(input) {
   // Sanitize the input
   input = sanitizeText(input);
 
-  console.log('Sanitized input → ', input);
-  // console.log('Possible answers → ', romanizations);
+  console.log('Sanitized input →', input);
+  console.log('Possible answers → ', romanizations);
 
   // Check if the input matches any of the romanizations
-  let isCorrect = romanizations.some(value => sanitizeText(value) === input);
+  let isCorrect = input !== "" && romanizations.some(value => sanitizeText(value) === input);
 
   if (isCorrect) {
     console.log('Correct!');
@@ -322,7 +319,7 @@ function resetStreak() {
  */
 function renderStreaks() {
   const { current, max } = getStreaks();
-  console.log(`Current Streak →  ${current}, Max Streak: ${max}`);
+  console.log(`Current Streak → ${current}, Max Streak → ${max}`);
   document.getElementById('currentStreak').textContent = current;
   document.getElementById('maxStreak').textContent = max;
 }
