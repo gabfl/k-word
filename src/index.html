@@ -109,19 +109,75 @@
           </div>
         </div>
 
-        <!-- Settings and Stats Modal -->
+        <!-- Stats Modal -->
+        <div class="modal fade" id="statsModal" tabindex="-1" aria-labelledby="statsModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+              <div class="modal-header">
+                <h5 class="modal-title" id="statsModalLabel">📊 My Stats</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+
+              <div class="modal-body">
+                <div class="row text-start justify-content-center">
+                  <div class="col-10 col-md-8">
+
+                    <div class="d-flex justify-content-between mb-2">
+                      <span>🔥 Current Streak:</span>
+                      <strong id="modalCurrentStreak">0</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span>🏆 Max Streak:</span>
+                      <strong id="modalMaxStreak">0</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span>✅ Correct Answers:</span>
+                      <strong id="modalCorrectAnswers">0</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span>❌ Wrong Attempts:</span>
+                      <strong id="modalWrongAnswers">0</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span>🎮 Words Played:</span>
+                      <strong id="modalWordsPlayed">0</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span>📈 Win Rate:</span>
+                      <strong id="modalWinRate">0%</strong>
+                    </div>
+
+                    <button id="shareStatsBtn" class="btn btn-outline-primary w-100 mt-3">
+                      📤 Share My Stats
+                    </button>
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-outline-danger" id="resetStatsBtn">🗑️ Reset Stats</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings Modal -->
         <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
 
               <div class="modal-header">
-                <h5 class="modal-title" id="settingsModalLabel">⚙️ Settings & Stats</h5>
+                <h5 class="modal-title" id="settingsModalLabel">⚙️ Settings</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
 
               <div class="modal-body text-center">
                 <p class="mb-3">Choose your theme:</p>
-                <div class="btn-group mb-2" role="group" aria-label="Theme toggle">
+                <div class="btn-group mb-4" role="group">
                   <input type="radio" class="btn-check" name="themeToggle" id="themeAuto" value="auto" autocomplete="off">
                   <label class="btn btn-outline-secondary" for="themeAuto">Auto</label>
 
@@ -131,32 +187,9 @@
                   <input type="radio" class="btn-check" name="themeToggle" id="themeDark" value="dark" autocomplete="off">
                   <label class="btn btn-outline-secondary" for="themeDark">Dark</label>
                 </div>
-
-                <hr>
-                <div class="row text-start justify-content-center">
-                  <div class="col-10 col-md-8">
-                    <h6 class="text-center mb-3">📊 Your Stats</h6>
-
-                    <div class="d-flex justify-content-between mb-2">
-                      <span>🔥 Current Streak:</span>
-                      <strong id="modalCurrentStreak">0</strong>
-                    </div>
-
-                    <div class="d-flex justify-content-between mb-2">
-                      <span>🏆 Max Streak:</span>
-                      <strong id="modalMaxStreak">0</strong>
-                    </div>
-
-                    <div class="d-flex justify-content-between mb-2">
-                      <span>✅ Win Rate:</span>
-                      <strong id="modalWinRate">0%</strong>
-                    </div>
-                  </div>
-                </div>
               </div>
 
-              <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-outline-danger" id="resetStatsBtn">🗑️ Reset Stats</button>
+              <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               </div>
 
@@ -193,6 +226,7 @@
         <!-- Footer Links -->
         <div class="text-center mb-3 text-secondary small">
           <a href="#" class="text-secondary text-decoration-underline" title="Help" data-bs-toggle="modal" data-bs-target="#helpModal">Help</a> |
+          <a href="#" class="text-secondary text-decoration-underline" title="Learn More" data-bs-toggle="modal" data-bs-target="#statsModal">Stats</a> | 
           <a href="#" class="text-secondary text-decoration-underline" title="Learn More" data-bs-toggle="modal" data-bs-target="#settingsModal">Settings</a> | 
           <a href="#" class="text-secondary text-decoration-underline" title="Learn More" data-bs-toggle="modal" data-bs-target="#aboutModal">About</a> | 
           &copy; <span id="year"></span>

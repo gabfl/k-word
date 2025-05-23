@@ -440,14 +440,19 @@ function welcomeModal() {
  * and updates the DOM elements in the modal.
  */
 function renderStatsInModal() {
-  const currentStreak = localStorage.getItem('currentStreak') || '0';
-  const maxStreak = localStorage.getItem('maxStreak') || '0';
-  const total = parseInt(localStorage.getItem('totalAttempts') || '0');
-  const correct = parseInt(localStorage.getItem('correctAnswers') || '0');
-  const winRate = total > 0 ? ((correct / total) * 100).toFixed(1) + '%' : '0%';
+  const currentStreak = parseInt(localStorage.getItem('currentStreak') || '0');
+  const maxStreak = parseInt(localStorage.getItem('maxStreak') || '0');
+  const totalAttempts = parseInt(localStorage.getItem('totalAttempts') || '0');
+  const correctAnswers = parseInt(localStorage.getItem('correctAnswers') || '0');
+  const wrongAnswers = totalAttempts - correctAnswers;
+  const wordsPlayed = correctAnswers + wrongAnswers;
+  const winRate = totalAttempts > 0 ? ((correctAnswers / totalAttempts) * 100).toFixed(1) + '%' : '0%';
 
   document.getElementById('modalCurrentStreak').textContent = currentStreak;
   document.getElementById('modalMaxStreak').textContent = maxStreak;
+  document.getElementById('modalCorrectAnswers').textContent = correctAnswers;
+  document.getElementById('modalWrongAnswers').textContent = wrongAnswers;
+  document.getElementById('modalWordsPlayed').textContent = wordsPlayed;
   document.getElementById('modalWinRate').textContent = winRate;
 }
 
@@ -499,6 +504,46 @@ function resetStatsEventListener() {
       renderStreaks(); // Optional: refresh main UI
     }
   });
+}
+
+/**
+ * Share the statistics event listener.
+ * This function adds an event listener to the share button
+ * that retrieves the statistics from local storage and shares them
+ * using the Web Share API or copies them to the clipboard.
+ * It also handles the fallback for browsers that do not support the Web Share API.
+ */
+function shareStatsEventListener() {
+  document.getElementById('shareStatsBtn').addEventListener('click', () => {
+  const currentStreak = localStorage.getItem('currentStreak') || '0';
+  const maxStreak = localStorage.getItem('maxStreak') || '0';
+  const totalAttempts = parseInt(localStorage.getItem('totalAttempts') || '0');
+  const correctAnswers = parseInt(localStorage.getItem('correctAnswers') || '0');
+  const wrongAnswers = totalAttempts - correctAnswers;
+  const wordsPlayed = correctAnswers + wrongAnswers;
+  const winRate = totalAttempts > 0 ? ((correctAnswers / totalAttempts) * 100).toFixed(1) + '%' : '0%';
+
+  const shareText = `📊 K-Word Stats:
+🔥 Current Streak: ${currentStreak}
+🏆 Max Streak: ${maxStreak}
+✅ Correct Answers: ${correctAnswers}
+❌ Wrong Attempts: ${wrongAnswers}
+🎮 Words Played: ${wordsPlayed}
+📈 Win Rate: ${winRate}
+playkword.com`;
+
+  if (navigator.share) {
+    navigator.share({
+      title: 'My K-Word Stats',
+      text: shareText,
+      url: 'https://playkword.com'
+    }).catch((err) => console.log('Share failed:', err));
+  } else {
+    navigator.clipboard.writeText(shareText)
+      .then(() => alert('📋 Stats copied to clipboard!'))
+      .catch(() => alert('❌ Failed to copy stats.'));
+  }
+});
 }
 
 /**
@@ -561,11 +606,12 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
 applyTheme(savedTheme);
 
 // Stats rendering when modal is shown
-const settingsModal = document.getElementById('settingsModal');
-settingsModal.addEventListener('show.bs.modal', renderStatsInModal);
+const statsModal = document.getElementById('statsModal');
+statsModal.addEventListener('show.bs.modal', renderStatsInModal);
 
-// Reset stats event listener
+// Reset/Share stats event listener
 resetStatsEventListener();
+shareStatsEventListener()
 
 // Update attempt display
 currentAttempt = parseInt(localStorage.getItem('currentAttempt') || recordAttempt())
