@@ -50,6 +50,9 @@ function play() {
   // Reset attempts
   resetAttempts();
 
+  // Render streaks
+  renderStreaks();
+
   // Hide elements
   correctAnswerShowOrHide(false);
   showOrHide('play-again', false);
@@ -99,20 +102,30 @@ function getRandomEntry() {
   return { korean, definition };
 }
 
+function sanitizeInput(input) {
+  // Remove leading/trailing whitespace
+  input = input.trim();
+
+  // Convert to lowercase
+  input = input.toLowerCase();
+
+  // Remove special characters
+  input = input.replace(/[^a-zA-Z0-9]/g, '');
+
+  return input;
+}
+
 /**
  * Check if the answer is correct.
  * @param {string} input - The user's answer.
  * @returns {boolean} - True if the answer is correct, false otherwise.
  */
 function checkAnswer(input) {
-  // Trim answer and correct answer
-  input = input.trim();
+  // Sanitize the input
+  input = sanitizeInput(input);
 
-  // Make input lowercase
-  input = input.toLowerCase();
-
-  console.log('Input → ', input);
-  console.log('Correct Answer → ', romanization);
+  console.log('Sanitized input → ', input);
+  console.log('Correct answer → ', romanization);
 
   if (input === romanization) {
     console.log('Correct!');
@@ -299,6 +312,22 @@ function updateAttemptDisplay() {
     `Attempt ${currentAttempts + 1}/${MAX_ATTEMPTS}`;
 }
 
+/**
+ * Show a welcome modal to the user.
+ */
+function welcomeModal() {
+  const hasDisabledModal = localStorage.getItem('kword-modal-disabled');
+
+  if (!hasDisabledModal) {
+    const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+    modal.show();
+  }
+
+  document.getElementById('dont-show').addEventListener('click', function () {
+    localStorage.setItem('kword-modal-disabled', 'true');
+  });
+}
+
 // load CSV
 loadCSV()
   .then(data => {
@@ -306,7 +335,22 @@ loadCSV()
     csvEntries = parseCSV(data);
     console.log('CSV data loaded successfully');
     play();
+    welcomeModal();
   })
   .catch(error => {
     console.error('Error loading CSV:', error);
   });
+
+// Check result
+// if the form is submitted, check the answer
+document.getElementById('word-form').addEventListener('submit', function(event) {
+  event.preventDefault();
+  const word = document.getElementById('word-input').value;
+  checkAnswer(word);
+});
+
+// Play again
+document.getElementById('play-again-form').addEventListener('submit', function(event) {
+  event.preventDefault();
+  play();
+});
