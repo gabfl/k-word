@@ -153,12 +153,12 @@ function getRandomEntry() {
 }
 
 /**
- * Sanitize the input by removing leading/trailing whitespace,
+ * Sanitize the text by removing leading/trailing whitespace,
  * converting to lowercase, and removing special characters.
- * @param {string} input - The user's input.
- * @returns {string} - The sanitized input.
+ * @param {string} input - Text.
+ * @returns {string} - The sanitized text.
  */
-function sanitizeInput(input) {
+function sanitizeText(input) {
   // Remove leading/trailing whitespace
   input = input.trim();
 
@@ -178,13 +178,13 @@ function sanitizeInput(input) {
  */
 function checkAnswer(input) {
   // Sanitize the input
-  input = sanitizeInput(input);
+  input = sanitizeText(input);
 
   console.log('Sanitized input → ', input);
   // console.log('Possible answers → ', romanizations);
 
   // Check if the input matches any of the romanizations
-  let isCorrect = romanizations.some(value => value.toLowerCase() === input);
+  let isCorrect = romanizations.some(value => sanitizeText(value) === input);
 
   if (isCorrect) {
     console.log('Correct!');
