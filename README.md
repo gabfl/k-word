@@ -2,6 +2,8 @@
 
 **K-Word** is a simple, browser-based game designed to help players learn Korean vocabulary through repetition, streaks, and fun challenges.
 
+🕹️ **Play online at** 👉 [https://playkword.com](https://playkword.com)
+
 ## 🎮 How to Play
 
 1. A Korean word is shown on screen.
@@ -17,7 +19,7 @@
 - ✅ Random word selection
 - ✅ Lightweight and runs entirely in the browser
 
-## 🛠️ Setup
+## 🛠️ Setup (for local development)
 
 You can run the game locally by simply opening the `src/index.html` file in a browser — or use a simple web server for better compatibility:
 
