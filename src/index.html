@@ -18,9 +18,9 @@
 
         <h1 class="text-center mb-4" id="output" style="font-size: 4rem;">Loading...</h1>
 
-        <form id="wordForm">
+        <form id="word-form">
           <div class="mb-3">
-            <input type="text" class="form-control" id="word-input" placeholder="Translation...">
+            <input type="text" class="form-control" id="word-input" placeholder="Romanization...">
           </div>
           <div class="d-grid">
             <div class="text-center mb-3" id="correct-answer" style="display: none;">
@@ -28,15 +28,10 @@
             </div>
             <div id="result-ok" style="display: none;">
                 <h2 id="wordInputSuccess" class="text-success text-center mb-4">✓</h2>
-                <div class="text-center">Definition: <span id="definition"></span></div>
             </div>
+            <div class="text-center" id="definition" style="display: none;"></div>
             <div id="result-error" style="display: none;">
                 <h2 id="wordInputError" class="text-danger text-center mb-4">Try again</h2>
-            </div>
-            <div id="play-again-offer" style="display: none;">
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary" id="play-again">Play again</button>
-                </div>
             </div>
           </div>
           <div class="d-grid">
@@ -47,6 +42,13 @@
           </div>
         </form>
 
+        <form id="play-again-form">
+            <div id="play-again-offer" style="display: none;">
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary" id="play-again">Play again</button>
+                </div>
+            </div>
+        </form>
 
         <div class="container py-2">
             <h2 class="text-center mb-4">Streak Tracker</h2>
@@ -85,18 +87,15 @@
 
   <script>
     // Check result
-    document.getElementById('submit-button').addEventListener('click', function() {
+    // if the form is submitted, check the answer
+    document.getElementById('word-form').addEventListener('submit', function(event) {
       event.preventDefault();
       const word = document.getElementById('word-input').value;
-      console.log('You submitted:', word);
-      console.log('Expected:', romanized);
-
-      checkAnswer(word, romanized);
+      checkAnswer(word);
     });
 
     // Play again
-    document.getElementById('play-again').addEventListener('click', function() {
-      document.getElementById('word-input').value = '';
+    document.getElementById('play-again-form').addEventListener('submit', function(event) {
       play();
     });
 

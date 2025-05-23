@@ -2,8 +2,8 @@
 
 const MAX_ATTEMPTS = 3;
 let korean;
-let english;
-let romanized;
+let definition;
+let romanization;
 let currentAttempts = 0;
 let csvEntries = [];
 
@@ -33,28 +33,35 @@ function loadCSV() {
 function play() {
   // Example usage
   const result = getRandomEntry();
-  console.log(`Korean: ${result.korean}`);
-  console.log(`English: ${result.english}`);
+  console.log(`Word → ${result.korean}`);
+  console.log(`Definition → ${result.definition}`);
   document.getElementById('output').textContent = result.korean;
-  document.getElementById('definition').textContent = result.english;
+  document.getElementById('definition').textContent = 'Definition: ' + result.definition;
 
-  romanized = Aromanize.romanize(result.korean);
-  console.log('Romanized:', romanized);
+  romanization = Aromanize.romanize(result.korean).trim();
+  console.log('Romanization →', romanization);
+
+  // Delete input value
+  document.getElementById('word-input').value = '';
+
+  // Unlock input
+  lockInput(false);
 
   // Reset attempts
   resetAttempts();
 
   // Hide elements
-  hideCorrectAnswer();
+  correctAnswerShowOrHide(false);
   showOrHide('play-again', false);
   showOrHide('correct-answer', false);
   showOrHide('result-ok', false);
   showOrHide('result-error', false);
+  showOrHide('definition', false);
   showOrHide('submit-button', true);
   showOrHide('attempt-display', true);
 
   korean = result.korean;
-  english = result.english;
+  definition = result.definition;
 }
 
 /**
@@ -62,7 +69,7 @@ function play() {
  * Each entry is an array with the first element being the Korean word
  * and the second element being the English definition.
  * @param {string} csv - The CSV data as a string.
- * @returns {Array} - An array of entries, each entry is an array of [korean, english].
+ * @returns {Array} - An array of entries, each entry is an array of [korean, definition].
   * The first element is the Korean word and the second element is the English definition.
   */
 function parseCSV(data) {
@@ -71,14 +78,14 @@ function parseCSV(data) {
     if (firstCommaIndex === -1) return [line, ''];
 
     const korean = line.slice(0, firstCommaIndex);
-    let english = line.slice(firstCommaIndex + 1);
+    let definition = line.slice(firstCommaIndex + 1);
 
     // Remove leading/trailing quotes
-    if (english.startsWith('"') && english.endsWith('"')) {
-      english = english.slice(1, -1);
+    if (definition.startsWith('"') && definition.endsWith('"')) {
+      definition = definition.slice(1, -1);
     }
 
-    return [korean, english];
+    return [korean, definition];
   });
 }
 
@@ -88,34 +95,35 @@ function parseCSV(data) {
  */
 function getRandomEntry() {
   const index = Math.floor(Math.random() * csvEntries.length);
-  const [korean, english] = csvEntries[index];
-  return { korean, english };
+  const [korean, definition] = csvEntries[index];
+  return { korean, definition };
 }
 
 /**
  * Check if the answer is correct.
- * @param {string} answer - The user's answer.
- * @param {string} correctAnswer - The correct answer.
+ * @param {string} input - The user's answer.
  * @returns {boolean} - True if the answer is correct, false otherwise.
  */
-function checkAnswer(input, correctAnswer) {
+function checkAnswer(input) {
   // Trim answer and correct answer
   input = input.trim();
-  correctAnswer = correctAnswer.trim();
 
   // Make input lowercase
   input = input.toLowerCase();
 
-  console.log(input);
-  console.log(correctAnswer);
+  console.log('Input → ', input);
+  console.log('Correct Answer → ', romanization);
 
-  if (input === correctAnswer) {
+  if (input === romanization) {
     console.log('Correct!');
     showOrHide('play-again', true);
     showOrHide('result-ok', true);
     showOrHide('result-error', false);
     showOrHide('correct-answer', false);
     showOrHide('submit-button', false);
+    showOrHide('attempt-display', false);
+    showOrHide('definition', true);
+    lockInput(true);
 
     // Update the streak
     handleStreak();
@@ -129,13 +137,16 @@ function checkAnswer(input, correctAnswer) {
 
     // Increase the attempt count
     recordAttempt();
+
     if (currentAttempts >= MAX_ATTEMPTS) {
       // Disable the input and show the correct answer
-      showCorrectAnswer(correctAnswer);
+      correctAnswerShowOrHide();
       showOrHide('play-again', true);
       showOrHide('submit-button', false);
       showOrHide('result-error', false);
       showOrHide('attempt-display', false);
+      showOrHide('definition', true);
+      lockInput(true);
 
       // Reset current streak
       resetStreak();
@@ -163,24 +174,36 @@ function showOrHide(section, show = true) {
     document.getElementById('submit-button').style.display = show ? 'block' : 'none';
   } else if (section === 'attempt-display') {
     document.getElementById('attempt-display').style.display = show ? 'block' : 'none';
+  } else if (section === 'definition') {
+    document.getElementById('definition').style.display = show ? 'block' : 'none';
   }
 }
 
 /**
- * Show the correct answer on the page.
- * @param {string} correctAnswer - The correct answer to be displayed.
+ * Show or hide the correct answer on the page.
+ * @param {boolean} show - Whether to show or hide the correct answer.
  */
-function showCorrectAnswer(correctAnswer) {
-  document.getElementById('correct-answer-text').textContent = `Correct answer: ${correctAnswer}`;
-  document.getElementById('correct-answer').style.display = 'block';
-  document.getElementById('play-again-offer').style.display = 'block';
+function correctAnswerShowOrHide(show = true) {
+  if (show) {
+    document.getElementById('correct-answer-text').textContent = `Correct answer: ${romanization}`;
+    document.getElementById('correct-answer').style.display = 'block';
+    document.getElementById('play-again-offer').style.display = 'block';
+  } else {
+    document.getElementById('correct-answer').style.display = 'none';
+  }
 }
 
 /**
- * Hide the correct answer on the page.
+ * Disable/Enable the input field.
+ * @param {boolean} disable - Whether to disable or enable the input field.
  */
-function hideCorrectAnswer() {
-  document.getElementById('correct-answer').style.display = 'none';
+function lockInput(disable = true) {
+  const inputField = document.getElementById('word-input');
+  if (disable) {
+    inputField.setAttribute('disabled', 'true');
+  } else {
+    inputField.removeAttribute('disabled');
+  }
 }
 
 /**
@@ -236,7 +259,7 @@ function resetStreak() {
  */
 function renderStreaks() {
   const { current, max } = getStreaks();
-  console.log(`Current Streak: ${current}, Max Streak: ${max}`);
+  console.log(`Current Streak →  ${current}, Max Streak: ${max}`);
   document.getElementById('currentStreak').textContent = current;
   document.getElementById('maxStreak').textContent = max;
 }
@@ -271,7 +294,7 @@ function recordAttempt() {
  * This function updates the DOM element that shows the number of attempts left.
  */
 function updateAttemptDisplay() {
-  console.log(`Attempt ${currentAttempts + 1}/${MAX_ATTEMPTS}`);
+  console.log(`Attempt → ${currentAttempts + 1}/${MAX_ATTEMPTS}`);
   document.getElementById('attempt-display').textContent =
     `Attempt ${currentAttempts + 1}/${MAX_ATTEMPTS}`;
 }
