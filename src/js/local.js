@@ -3,7 +3,7 @@ const savedTheme = localStorage.getItem('theme') || 'auto';
 let korean;
 let definition;
 let romanizations;
-let currentAttempts = 0;
+let currentAttempt = parseInt(localStorage.getItem('currentAttempt') || '1');;
 let csvEntries = [];
 
 /**
@@ -38,8 +38,8 @@ function loadCSV() {
 function play() {
   // Example usage
   const result = getCurrentOrNewEntry();
-  console.log(`Word → ${result.korean}`);
-  console.log(`Definition → ${result.definition}`);
+  // console.log(`Word → ${result.korean}`);
+  // console.log(`Definition → ${result.definition}`);
   document.getElementById('output').textContent = result.korean;
   document.getElementById('definition').textContent = 'Definition: ' + result.definition;
 
@@ -50,16 +50,13 @@ function play() {
     Aromanize.romanize(result.korean, 'ebi').trim(),
     Aromanize.romanize(result.korean, 'konsevich').trim(),
   ]
-  console.log('Romanizations →', romanizations);
+  // console.log('Romanizations →', romanizations);
 
   // Delete input value
   document.getElementById('word-input').value = '';
 
   // Unlock input
   lockInput(false);
-
-  // Reset attempts
-  resetAttempts();
 
   // Render streaks
   renderStreaks();
@@ -184,7 +181,7 @@ function checkAnswer(input) {
   input = sanitizeInput(input);
 
   console.log('Sanitized input → ', input);
-  console.log('Possible answers → ', romanizations);
+  // console.log('Possible answers → ', romanizations);
 
   // Check if the input matches any of the romanizations
   let isCorrect = romanizations.some(value => value.toLowerCase() === input);
@@ -206,6 +203,9 @@ function checkAnswer(input) {
     // Update the statistics
     updateStats(true);
 
+    // Reset attempts
+    resetAttempts();
+
     // Re-render the streak
     renderStreaks();
 
@@ -216,10 +216,7 @@ function checkAnswer(input) {
     showOrHide('result-ok', false);
     showOrHide('result-error', true);
 
-    // Increase the attempt count
-    recordAttempt();
-
-    if (currentAttempts >= MAX_ATTEMPTS) {
+    if (currentAttempt >= MAX_ATTEMPTS) {
       // Disable the input and show the correct answer
       correctAnswerShowOrHide();
       showOrHide('play-again', true);
@@ -232,11 +229,17 @@ function checkAnswer(input) {
       // Reset current streak
       resetStreak();
 
+      // Reset attempts
+      resetAttempts();
+
       // Clear the current entry from local storage
       clearCurrentEntry();
 
       // Update the statistics
       updateStats(false);
+    } else {
+      // Increase the attempt count
+      recordAttempt();
     }
 
     return false;
@@ -328,24 +331,14 @@ function renderStreaks() {
  * Update the attempt display on the page.
  * This function updates the DOM element that shows the number of attempts left.
  */
-function resetAttempts() {
-  console.log('Resetting attempts');
-  currentAttempts = 0;
-  updateAttemptDisplay();
-}
-
-/**
- * Update the attempt display on the page.
- * This function updates the DOM element that shows the number of attempts left.
- */
 function recordAttempt() {
-  if (currentAttempts < MAX_ATTEMPTS) {
-    currentAttempts++;
-    updateAttemptDisplay();
-    // if (currentAttempts === MAX_ATTEMPTS) {
-    //   alert("No attempts left. Try again later.");
-    //   // Optionally disable input or show correct answer
-    // }
+  console.log('Record attempt');
+  let attempt = parseInt(localStorage.getItem('currentAttempt') || '0');
+
+  if (attempt < 3) {
+    attempt++;
+    localStorage.setItem('currentAttempt', attempt);
+    updateAttemptDisplay(attempt);
   }
 }
 
@@ -353,10 +346,21 @@ function recordAttempt() {
  * Update the attempt display on the page.
  * This function updates the DOM element that shows the number of attempts left.
  */
-function updateAttemptDisplay() {
-  console.log(`Attempt → ${currentAttempts + 1}/${MAX_ATTEMPTS}`);
-  document.getElementById('attempt-display').textContent =
-    `Attempt ${currentAttempts + 1}/${MAX_ATTEMPTS}`;
+function resetAttempts() {
+  console.log('Resetting attempts');
+  localStorage.setItem('currentAttempt', 1);
+  updateAttemptDisplay(1);
+}
+
+/**
+ * Update the attempt display on the page.
+ * This function updates the DOM element that shows the number of attempts left.
+ * @param {number} attempt - The current attempt number.
+ */
+function updateAttemptDisplay(attempt) {
+  currentAttempt = attempt;
+  console.log(`Attempt → ${currentAttempt}/${MAX_ATTEMPTS}`);
+  document.getElementById('attempt-display').textContent = `Attempt ${currentAttempt}/${MAX_ATTEMPTS}`;
 }
 
 /**
@@ -505,7 +509,7 @@ loadCSV()
   .then(data => {
     // Parse CSV data into entries
     csvEntries = parseCSV(data);
-    console.log('CSV data loaded successfully');
+    console.log('Dictionary data loaded successfully');
     play();
     welcomeModal();
   })
@@ -556,3 +560,6 @@ settingsModal.addEventListener('show.bs.modal', renderStatsInModal);
 
 // Reset stats event listener
 resetStatsEventListener();
+
+// Update attempt display
+updateAttemptDisplay(currentAttempt);
