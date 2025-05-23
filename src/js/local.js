@@ -99,7 +99,17 @@ function getRandomEntry() {
  * @returns {boolean} - True if the answer is correct, false otherwise.
  */
 function checkAnswer(input, correctAnswer) {
-  if (input.trim() === correctAnswer.trim()) {
+  // Trim answer and correct answer
+  input = input.trim();
+  correctAnswer = correctAnswer.trim();
+
+  // Make input lowercase
+  input = input.toLowerCase();
+
+  console.log(input);
+  console.log(correctAnswer);
+
+  if (input === correctAnswer) {
     console.log('Correct!');
     showOrHide('play-again', true);
     showOrHide('result-ok', true);
