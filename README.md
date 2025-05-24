@@ -1,8 +1,8 @@
-# 🇰🇷 K-Word
+# 🇰🇷 Korean Word Game
 
-**K-Word** is a simple, browser-based game designed to help players learn Korean vocabulary through repetition, streaks, and fun challenges.
+**KKorean Word** is a simple, browser-based game designed to help players learn Korean vocabulary through repetition, streaks, and fun challenges.
 
-🕹️ **Play online at** 👉 [https://playkword.com](https://playkword.com)
+🕹️ **Play online at** 👉 [https://koreanword.com](https://koreanword.com)
 
 ## 🎮 How to Play
 

@@ -1,4 +1,6 @@
 const MAX_ATTEMPTS = 3;
+const SITE_URL = 'https://koreanword.com';
+const SITE_NAME = 'Korean Word';
 const savedTheme = localStorage.getItem('theme') || 'auto';
 let korean;
 let definition;
@@ -382,6 +384,7 @@ function applyTheme(theme) {
   body.classList.remove('light-mode', 'dark-mode'); // Optional: if you had custom classes
 
   const tableHead = document.querySelector('#streakTable thead');
+  const metaTheme = document.getElementById('meta-theme-color');
 
   if (theme === 'dark') {
     body.setAttribute('data-bs-theme', 'dark');
@@ -391,6 +394,9 @@ function applyTheme(theme) {
     // Header of streak table
     tableHead.classList.remove('table-light');
     tableHead.classList.add('table-dark');
+
+    // Update meta theme color
+    metaTheme.setAttribute('content', '#1a1a1a');
   } else if (theme === 'light') {
     body.setAttribute('data-bs-theme', 'light');
     body.classList.remove('bg-dark', 'text-light');
@@ -399,6 +405,9 @@ function applyTheme(theme) {
     // Header of streak table
     tableHead.classList.remove('table-dark');
     tableHead.classList.add('table-light');
+
+    // Update meta theme color
+    metaTheme.setAttribute('content', '#ffffff');
   } else if (theme === 'auto') {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const systemTheme = prefersDark ? 'dark' : 'light';
@@ -523,7 +532,7 @@ function shareStatsEventListener() {
   const wordsPlayed = correctAnswers + wrongAnswers;
   const winRate = totalAttempts > 0 ? ((correctAnswers / totalAttempts) * 100).toFixed(1) + '%' : '0%';
 
-  let shareText = `📊 K-Word Stats:
+  let shareText = `📊 ${SITE_NAME} Stats:
 🔥 Current Streak: ${currentStreak}
 🏆 Max Streak: ${maxStreak}
 ✅ Correct Answers: ${correctAnswers}
@@ -533,13 +542,13 @@ function shareStatsEventListener() {
 
   if (navigator.share) {
     navigator.share({
-      title: 'My K-Word Stats',
+      title: `My ${SITE_NAME} Stats`,
       text: shareText,
-      url: 'https://playkword.com'
+      url: SITE_URL
     }).catch((err) => console.log('Share failed:', err));
   } else {
     // Add URL to the share text
-    shareText = `${shareText}\n\nPlay K-Word: https://playkword.com`;
+    shareText = `${shareText}\n\nPlay ${SITE_NAME}: ${SITE_URL}`;
 
     navigator.clipboard.writeText(shareText)
       .then(() => alert('📋 Stats copied to clipboard!'))
