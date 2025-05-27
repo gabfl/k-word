@@ -57,7 +57,10 @@
         <h1 class="text-center mb-4">Korean Word Game</h1>
 
         <!-- Korean word display -->
-        <h1 class="text-center mb-4" id="output" style="font-size: 4rem;"></h1>
+        <h1 class="text-center mb-4" style="font-size: 4rem;">
+          <span id="output" role="button" data-bs-toggle="modal" data-bs-target="#hintModal" class="text-decoration-none">
+          </span>
+        </h1>
 
         <!-- Game -->
         <form id="word-form">
@@ -114,11 +117,11 @@
         </div>
 
         <!-- Welcome Modal -->
-        <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+        <div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="helpModalLabel">Welcome to Korean Word! 🇰🇷</h5>
+                <h5 class="modal-title" id="welcomeModalLabel">Welcome to Korean Word! 🇰🇷</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
@@ -131,6 +134,10 @@
                 <p><em>Your Answer:</em> <code>so-ri</code></p>
 
                 <p class="mt-3">Keep your streak going and try to beat your high score!</p>
+
+                <p class="mt-3 text-muted">
+                  🧩 Need help? <strong>Click on the Korean word</strong> at the top of the screen to view the <a href="#" id="openHintFromHelp">Hangul-to-Romanization reference table</a>.
+                </p>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -254,15 +261,74 @@
           </div>
         </div>
 
+        <!-- Hint Modal -->
+        <div class="modal fade" id="hintModal" tabindex="-1" aria-labelledby="hintModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="hintModalLabel">🧩 Hangul Romanization Reference</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+
+              <div class="modal-body">
+
+                <h6>Vowels</h6>
+                <table id="hintVowelsTable" class="table table-bordered text-center align-middle small">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Hangul</th>
+                      <th>ㅏ</th><th>ㅐ</th><th>ㅑ</th><th>ㅒ</th><th>ㅓ</th><th>ㅔ</th><th>ㅕ</th><th>ㅖ</th><th>ㅗ</th><th>ㅘ</th><th>ㅙ</th><th>ㅚ</th><th>ㅛ</th><th>ㅜ</th><th>ㅝ</th><th>ㅞ</th><th>ㅟ</th><th>ㅡ</th><th>ㅢ</th><th>ㅣ</th>
+                    </tr>
+                    <tr>
+                      <th>Romanization</th>
+                      <td>a</td><td>ae</td><td>ya</td><td>yae</td><td>eo</td><td>e</td><td>yeo</td><td>ye</td><td>o</td><td>wa</td><td>wae</td><td>oe</td><td>yo</td><td>u</td><td>wo</td><td>we</td><td>wi</td><td>eu</td><td>ui</td><td>i</td>
+                    </tr>
+                  </thead>
+                </table>
+
+                <h6 class="mt-4">Consonants</h6>
+                <table id="hintConsonantsTable" class="table table-bordered text-center align-middle small">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Hangul</th>
+                      <th>ㄱ</th><th>ㄲ</th><th>ㄴ</th><th>ㄷ</th><th>ㄸ</th><th>ㄹ</th><th>ㅁ</th><th>ㅂ</th><th>ㅃ</th><th>ㅅ</th><th>ㅆ</th><th>ㅇ</th><th>ㅈ</th><th>ㅉ</th><th>ㅊ</th><th>ㅋ</th><th>ㅌ</th><th>ㅍ</th><th>ㅎ</th>
+                    </tr>
+                    <tr>
+                      <th>Initial</th>
+                      <td>g</td><td>kk</td><td rowspan="2" style="vertical-align: middle; text-align: center;">n</td><td>d</td><td>tt</td><td>r</td><td rowspan="2" style="vertical-align: middle; text-align: center;">m</td><td>b</td><td>pp</td><td>s</td><td>ss</td><td>Ø</td><td>j</td><td>jj</td><td>ch</td><td rowspan="2" style="vertical-align: middle; text-align: center;">k</td><td rowspan="2" style="vertical-align: middle; text-align: center;">t</td><td rowspan="2" style="vertical-align: middle; text-align: center;">p</td><td>h</td>
+                    </tr>
+                    <tr>
+                      <th>Final</th>
+                      <td>k</td><td>k</td><td>t</td><td>–</td><td>l</td><td>p</td><td>–</td><td>t</td><td>t</td><td>ng</td><td>t</td><td>–</td><td>t</td><td>t</td>
+                    </tr>
+                  </thead>
+                </table>
+
+                <p class="text-center mt-4 small">
+                  📚 Want to dive deeper? Learn more about Korean romanization on 
+                  <a href="https://en.wikipedia.org/wiki/Revised_Romanization_of_Korean" target="_blank" rel="noopener noreferrer">Wikipedia</a>.
+                </p>
+
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
         <!-- Footer Links -->
         <div class="text-center mb-3 text-secondary small">
-          <a href="#" class="text-secondary text-decoration-underline" title="Help" data-bs-toggle="modal" data-bs-target="#helpModal">Help</a> |
+          <a href="#" class="text-secondary text-decoration-underline" title="Help" data-bs-toggle="modal" data-bs-target="#welcomeModal">How to Play</a> |
+          <a href="#" class="text-secondary text-decoration-underline" title="Help" data-bs-toggle="modal" data-bs-target="#hintModal">Reference</a> |
           <a href="#" class="text-secondary text-decoration-underline" title="Learn More" data-bs-toggle="modal" data-bs-target="#statsModal">Stats</a> | 
           <a href="#" class="text-secondary text-decoration-underline" title="Learn More" data-bs-toggle="modal" data-bs-target="#settingsModal">Settings</a> | 
-          <a href="#" class="text-secondary text-decoration-underline" title="Learn More" data-bs-toggle="modal" data-bs-target="#aboutModal">About</a> | 
-          &copy; <span id="year"></span>
+          <a href="#" class="text-secondary text-decoration-underline" title="Learn More" data-bs-toggle="modal" data-bs-target="#aboutModal">About</a>
           <br />
-          Made with ❤️ and <a href="https://github.com/gabfl/korean-word" target="_blank" class="text-secondary text-decoration-underline">open source</a>
+          Made with ❤️ and <a href="https://github.com/gabfl/korean-word" target="_blank" class="text-secondary text-decoration-underline">open source</a> | 
+          &copy; <span id="year"></span>
         </div>
 
       </div>

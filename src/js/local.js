@@ -368,7 +368,18 @@ function resetAttempts() {
 function updateAttemptDisplay(attempt) {
   currentAttempt = attempt;
   console.log(`Attempt → ${currentAttempt}/${MAX_ATTEMPTS}`);
-  document.getElementById('attempt-display').textContent = `Attempt ${currentAttempt}/${MAX_ATTEMPTS}`;
+
+  const display = document.getElementById('attempt-display');
+
+  // Set base text
+  let text = `Attempt ${currentAttempt}/${MAX_ATTEMPTS}`;
+
+  // Show hint icon if attempt > 1
+  if (currentAttempt > 1) {
+    text += ` <a href="#" data-bs-toggle="modal" data-bs-target="#hintModal" title="View Hangul reference" class="text-decoration-none">🧩</a>`;
+  }
+
+  display.innerHTML = text;
 }
 
 /**
@@ -383,7 +394,9 @@ function applyTheme(theme) {
   const body = document.body;
   body.classList.remove('light-mode', 'dark-mode'); // Optional: if you had custom classes
 
-  const tableHead = document.querySelector('#streakTable thead');
+  const streakTableHead = document.querySelector('#streakTable thead');
+  const hintVowelsTableHead = document.querySelector('#hintVowelsTable thead');
+  const hintConsonantsTableHead = document.querySelector('#hintConsonantsTable thead');
   const metaTheme = document.getElementById('meta-theme-color');
 
   if (theme === 'dark') {
@@ -392,8 +405,14 @@ function applyTheme(theme) {
     body.classList.add('bg-dark', 'text-light');
 
     // Header of streak table
-    tableHead.classList.remove('table-light');
-    tableHead.classList.add('table-dark');
+    streakTableHead.classList.remove('table-light');
+    streakTableHead.classList.add('table-dark');
+
+    // Header of hints tables
+    hintVowelsTableHead.classList.remove('table-light');
+    hintVowelsTableHead.classList.add('table-dark');
+    hintConsonantsTableHead.classList.remove('table-light');
+    hintConsonantsTableHead.classList.add('table-dark');
 
     // Update meta theme color
     metaTheme.setAttribute('content', '#1a1a1a');
@@ -403,8 +422,14 @@ function applyTheme(theme) {
     body.classList.add('bg-light');
 
     // Header of streak table
-    tableHead.classList.remove('table-dark');
-    tableHead.classList.add('table-light');
+    streakTableHead.classList.remove('table-dark');
+    streakTableHead.classList.add('table-light');
+
+    // Header of hints tables
+    hintVowelsTableHead.classList.remove('table-dark');
+    hintVowelsTableHead.classList.add('table-light');
+    hintConsonantsTableHead.classList.remove('table-dark');
+    hintConsonantsTableHead.classList.add('table-light');
 
     // Update meta theme color
     metaTheme.setAttribute('content', '#ffffff');
@@ -433,7 +458,7 @@ function welcomeModal() {
   const hasDisabledModal = localStorage.getItem('kword-modal-disabled');
 
   if (!hasDisabledModal) {
-    const modal = new bootstrap.Modal(document.getElementById('helpModal'));
+    const modal = new bootstrap.Modal(document.getElementById('welcomeModal'));
     modal.show();
   }
 
@@ -558,6 +583,25 @@ function shareStatsEventListener() {
 }
 
 /**
+ * Switch between modals.
+ * This function hides the current modal and shows the target modal.
+ * It also ensures that the target modal is shown only after the current modal is fully hidden.
+ */
+function switchModal(fromId, toId) {
+  const fromModalEl = document.getElementById(fromId);
+  const toModalEl = document.getElementById(toId);
+
+  const fromModal = bootstrap.Modal.getInstance(fromModalEl);
+  fromModal.hide();
+
+  fromModalEl.addEventListener('hidden.bs.modal', function onHidden() {
+    fromModalEl.removeEventListener('hidden.bs.modal', onHidden);
+    const toModal = new bootstrap.Modal(toModalEl);
+    toModal.show();
+  });
+}
+
+/**
  * Render the current year on the page.
  * This function retrieves the current year and updates the DOM element.
  */
@@ -627,3 +671,9 @@ shareStatsEventListener()
 // Update attempt display
 currentAttempt = parseInt(localStorage.getItem('currentAttempt') || recordAttempt())
 updateAttemptDisplay(currentAttempt);
+
+// Open hint from help modal
+document.getElementById('openHintFromHelp').addEventListener('click', function (e) {
+  e.preventDefault();
+  switchModal('welcomeModal', 'hintModal');
+});
