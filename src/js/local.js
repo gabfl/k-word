@@ -6,6 +6,7 @@ let korean;
 let definition;
 let romanizations;
 let currentAttempt;
+let lastSubmittedValue = '';
 let csvEntries = [];
 
 /**
@@ -383,6 +384,38 @@ function updateAttemptDisplay(attempt) {
 }
 
 /**
+ * Sanitize the input text and check if it has changed from the last submitted value.
+ * @param {string} current - The current input text.
+ * @returns {boolean} - True if the input has changed, false otherwise.
+ */
+function hasInputChanged(current) {
+  return sanitizeText(current) !== lastSubmittedValue;
+}
+
+/**
+ * Disable or enable the submit button based on the input value.
+ */
+function disableSubmit() {
+  document.getElementById('submit-button').disabled = true;
+}
+
+/**
+ * Enable the submit button.
+ */
+function enableSubmit() {
+  document.getElementById('submit-button').disabled = false;
+}
+
+/**
+ * Reset the submission state.
+ */
+function resetSubmissionState() {
+  lastSubmittedValue = '';
+  enableSubmit();
+  document.getElementById('word-input').value = '';
+}
+
+/**
  * Apply the selected theme to the page.
  * This function updates the body class and theme attributes based on the selected theme.
  * It also updates the table header class for the streak table.
@@ -630,8 +663,24 @@ renderYear()
 // if the form is submitted, check the answer
 document.getElementById('word-form').addEventListener('submit', function(event) {
   event.preventDefault();
+
   const word = document.getElementById('word-input').value;
+
+  if (!hasInputChanged(word)) {
+    console.log('Input has not changed — ignoring submission');
+    return;
+  }
+
+  lastSubmittedValue = sanitizeText(word);
   checkAnswer(word);
+  disableSubmit();
+});
+
+// Input change handler
+document.getElementById('word-input').addEventListener('input', function () {
+  if (hasInputChanged(this.value)) {
+    enableSubmit();
+  }
 });
 
 // Play again
