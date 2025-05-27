@@ -422,54 +422,57 @@ function resetSubmissionState() {
  * @param {string} theme - The selected theme ('dark', 'light', or 'auto').
  */
 function applyTheme(theme) {
-  console.log('Theme → ', savedTheme);
+  console.log('Theme →', theme);
 
   const body = document.body;
-  body.classList.remove('light-mode', 'dark-mode'); // Optional: if you had custom classes
+  body.classList.remove('light-mode', 'dark-mode'); // Optional: legacy support
 
   const streakTableHead = document.querySelector('#streakTable thead');
   const hintVowelsTableHead = document.querySelector('#hintVowelsTable thead');
   const hintConsonantsTableHead = document.querySelector('#hintConsonantsTable thead');
   const metaTheme = document.getElementById('meta-theme-color');
 
+  // Handle 'auto' mode by detecting system preference
+  if (theme === 'auto') {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    theme = prefersDark ? 'dark' : 'light';
+  }
+
+  // Apply theme to body and meta
   if (theme === 'dark') {
     body.setAttribute('data-bs-theme', 'dark');
     body.classList.remove('bg-light');
     body.classList.add('bg-dark', 'text-light');
-
-    // Header of streak table
-    streakTableHead.classList.remove('table-light');
-    streakTableHead.classList.add('table-dark');
-
-    // Header of hints tables
-    hintVowelsTableHead.classList.remove('table-light');
-    hintVowelsTableHead.classList.add('table-dark');
-    hintConsonantsTableHead.classList.remove('table-light');
-    hintConsonantsTableHead.classList.add('table-dark');
-
-    // Update meta theme color
     metaTheme.setAttribute('content', '#1a1a1a');
-  } else if (theme === 'light') {
+  } else {
     body.setAttribute('data-bs-theme', 'light');
     body.classList.remove('bg-dark', 'text-light');
     body.classList.add('bg-light');
-
-    // Header of streak table
-    streakTableHead.classList.remove('table-dark');
-    streakTableHead.classList.add('table-light');
-
-    // Header of hints tables
-    hintVowelsTableHead.classList.remove('table-dark');
-    hintVowelsTableHead.classList.add('table-light');
-    hintConsonantsTableHead.classList.remove('table-dark');
-    hintConsonantsTableHead.classList.add('table-light');
-
-    // Update meta theme color
     metaTheme.setAttribute('content', '#ffffff');
-  } else if (theme === 'auto') {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const systemTheme = prefersDark ? 'dark' : 'light';
-    applyTheme(systemTheme); // Reuse logic for actual mode
+  }
+
+  // Update all table headers
+  updateTableHeaderTheme(streakTableHead, theme);
+  updateTableHeaderTheme(hintVowelsTableHead, theme);
+  updateTableHeaderTheme(hintConsonantsTableHead, theme);
+}
+
+/**
+ * Update the theme of the table header.
+ * This function updates the class of the table header element
+ * based on the selected theme.
+ * @param {HTMLElement} theadElement - The table header element to update.
+ * @param {string} theme - The selected theme ('dark' or 'light').
+ */
+function updateTableHeaderTheme(theadElement, theme) {
+  if (!theadElement) return;
+
+  theadElement.classList.remove('table-light', 'table-dark');
+
+  if (theme === 'dark') {
+    theadElement.classList.add('table-dark');
+  } else {
+    theadElement.classList.add('table-light');
   }
 }
 
