@@ -1,13 +1,16 @@
 const MAX_ATTEMPTS = 3;
 const SITE_URL = 'https://koreanword.com';
 const SITE_NAME = 'Korean Word';
-const savedTheme = localStorage.getItem('theme') || 'auto';
 let korean;
 let definition;
 let romanizations;
 let currentAttempt;
 let lastSubmittedValue = '';
 let csvEntries = [];
+const settings = {
+  difficulty: 'normal',
+  theme: localStorage.getItem('theme') || 'auto'
+};
 
 /**
  * Load CSV data from a file.
@@ -147,12 +150,46 @@ function clearCurrentEntry() {
 
 /**
  * Get a random entry from the CSV data.
- * @param {string} csv - The CSV data as a string.
  */
 function getRandomEntry() {
-  const index = Math.floor(Math.random() * csvEntries.length);
-  const [korean, definition] = csvEntries[index];
+  let pool = csvEntries;
+
+  if (settings.difficulty === 'easy') {
+    pool = csvEntries.filter(([korean]) => countSyllables(korean) === 2);
+  } else if (settings.difficulty === 'hard') {
+    pool = csvEntries.filter(([korean]) => countSyllables(korean) >= 3);
+  }
+
+  if (pool.length === 0) {
+    console.warn(`No entries match the selected difficulty: ${settings.difficulty}`);
+    return null;
+  }
+
+  // console.log(`Dictionary size for difficulty "${settings.difficulty}": ${pool.length}`);
+
+  const index = crypto.getRandomValues(new Uint32Array(1))[0] % pool.length;
+  const [korean, definition] = pool[index];
   return { korean, definition };
+}
+
+/**
+ * Count the number of syllables in a Korean word.
+ * @param {string} word - The Korean word.
+ * @returns {number} - The number of syllables in the word.
+ */
+function countSyllables(word) {
+  return [...word].filter(char => isHangul(char)).length;
+}
+
+/**
+ * Check if a character is a Hangul syllable.
+ * @param {string} char - The character to check.
+ * @returns {boolean} - True if the character is a Hangul syllable, false otherwise.
+ */
+function isHangul(char) {
+  const code = char.charCodeAt(0);
+  // Hangul syllables range: U+AC00 to U+D7AF
+  return code >= 0xAC00 && code <= 0xD7AF;
 }
 
 /**
@@ -187,7 +224,7 @@ function checkAnswer(input) {
   }
 
   console.log('Sanitized input →', input);
-  console.log('Possible answers → ', romanizations);
+  // console.log('Possible answers → ', romanizations);
 
   // Check if the input matches any of the romanizations
   let isCorrect = romanizations.some(value => sanitizeText(value) === input);
@@ -418,10 +455,9 @@ function resetSubmissionState() {
 /**
  * Apply the selected theme to the page.
  * This function updates the body class and theme attributes based on the selected theme.
- * It also updates the table header class for the streak table.
- * @param {string} theme - The selected theme ('dark', 'light', or 'auto').
  */
-function applyTheme(theme) {
+function applyTheme() {
+  let theme = localStorage.getItem('theme') || 'auto';
   console.log('Theme →', theme);
 
   const body = document.body;
@@ -484,7 +520,45 @@ function updateTableHeaderTheme(theadElement, theme) {
  */
 function saveTheme(theme) {
   localStorage.setItem('theme', theme);
-  applyTheme(theme);
+  settings.theme = theme;
+  applyTheme();
+}
+
+/**
+ * Load the difficulty setting from local storage.
+ */
+function loadSettings() {
+  const storedDifficulty = localStorage.getItem('difficulty');
+  const storedTheme = localStorage.getItem('theme');
+
+  settings.difficulty = storedDifficulty || 'normal';
+  settings.theme = storedTheme || 'auto';
+
+  // Reflect difficulty
+  const difficultyRadio = document.querySelector(`input[name="difficultyToggle"][value="${settings.difficulty}"]`);
+  if (difficultyRadio) difficultyRadio.checked = true;
+
+  // Reflect theme
+  const themeRadio = document.querySelector(`input[name="themeToggle"][value="${settings.theme}"]`);
+  if (themeRadio) themeRadio.checked = true;
+}
+
+/**
+ * Save the selected difficulty to local storage.
+ * @param {string} difficulty - The selected difficulty ('easy', 'normal', or 'hard').
+ */
+function saveDifficulty(difficulty) {
+  const valid = ['easy', 'normal', 'hard'];
+  if (!valid.includes(difficulty)) {
+    console.warn('Invalid difficulty level:', difficulty);
+    return;
+  }
+
+  localStorage.setItem('difficulty', difficulty);
+  settings.difficulty = difficulty;
+
+  const radio = document.querySelector(`input[name="difficultyToggle"][value="${difficulty}"]`);
+  if (radio) radio.checked = true;
 }
 
 /**
@@ -574,6 +648,45 @@ function resetStatsEventListener() {
       renderStreaks(); // Optional: refresh main UI
     }
   });
+}
+
+/**
+ * Change difficulty event listener.
+ */
+function changeDifficultyEventListener() {
+  document.querySelectorAll('input[name="difficultyToggle"]').forEach(el => {
+    el.addEventListener('change', (e) => {
+      const selected = e.target.value;
+      saveDifficulty(selected);       // Save to settings and localStorage
+
+      // Show message to user
+      showDifficultyMessage(selected);
+    });
+  });
+}
+
+
+/**
+ * Show a message to the user when the difficulty is changed.
+ * @param {string} level - The selected difficulty level ('easy', 'normal', or 'hard').
+ */
+function showDifficultyMessage(level) {
+  const messageBox = document.getElementById('difficultyMessage');
+  messageBox.innerHTML = `✅ Difficulty set to <strong>${capitalize(level)}</strong>. It will apply to the next word.`;
+  messageBox.style.display = 'block';
+
+  // Hide the message after 7 seconds
+  setTimeout(() => {
+    messageBox.style.display = 'none';
+  }, 7000);
+}
+
+/**
+ * Capitalize the first letter of a word.
+ * @param {string} word - The word to capitalize.
+ */
+function capitalize(word) {
+  return word.charAt(0).toUpperCase() + word.slice(1);
 }
 
 /**
@@ -693,7 +806,7 @@ document.getElementById('play-again-form').addEventListener('submit', function(e
 });
 
 // Theme toggle
-const selected = document.querySelector(`input[name="themeToggle"][value="${savedTheme}"]`);
+const selected = document.querySelector(`input[name="themeToggle"][value="${settings.theme}"]`);
 if (selected) selected.checked = true;
 
 document.querySelectorAll('input[name="themeToggle"]').forEach(btn => {
@@ -704,21 +817,23 @@ document.querySelectorAll('input[name="themeToggle"]').forEach(btn => {
 
 // Re-apply on system theme change if in auto mode
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-  if (localStorage.getItem('theme') === 'auto') {
-    applyTheme('auto');
-  }
+  applyTheme();
 });
 
+// Load settings
+loadSettings();
+
 // Initial theme load
-applyTheme(savedTheme);
+applyTheme();
 
 // Stats rendering when modal is shown
 const statsModal = document.getElementById('statsModal');
 statsModal.addEventListener('show.bs.modal', renderStatsInModal);
 
-// Reset/Share stats event listener
+// Event listeners
 resetStatsEventListener();
 shareStatsEventListener()
+changeDifficultyEventListener()
 
 // Update attempt display
 currentAttempt = parseInt(localStorage.getItem('currentAttempt') || recordAttempt())

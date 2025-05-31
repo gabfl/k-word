@@ -214,6 +214,8 @@
               </div>
 
               <div class="modal-body text-center">
+
+                <!-- Theme selection -->
                 <p class="mb-3">Choose your theme:</p>
                 <div class="btn-group mb-4" role="group">
                   <input type="radio" class="btn-check" name="themeToggle" id="themeAuto" value="auto" autocomplete="off">
@@ -225,6 +227,20 @@
                   <input type="radio" class="btn-check" name="themeToggle" id="themeDark" value="dark" autocomplete="off">
                   <label class="btn btn-outline-secondary" for="themeDark">Dark</label>
                 </div>
+
+                <!-- Difficulty selection -->
+                <p class="mb-3">Choose difficulty:</p>
+                <div class="btn-group mb-3" role="group">
+                  <input type="radio" class="btn-check" name="difficultyToggle" id="difficultyEasy" value="easy" autocomplete="off">
+                  <label class="btn btn-outline-secondary" for="difficultyEasy">Easy (2 syllables)</label>
+
+                  <input type="radio" class="btn-check" name="difficultyToggle" id="difficultyNormal" value="normal" autocomplete="off" checked>
+                  <label class="btn btn-outline-secondary" for="difficultyNormal">Normal</label>
+
+                  <input type="radio" class="btn-check" name="difficultyToggle" id="difficultyHard" value="hard" autocomplete="off">
+                  <label class="btn btn-outline-secondary" for="difficultyHard">Hard (3+ syllables)</label>
+                </div>
+                <div id="difficultyMessage" class="text-success mt-2" style="display: none;"></div>
               </div>
 
               <div class="modal-footer">
